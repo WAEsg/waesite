@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { allLongTailRoles } from "@/lib/skills-data";
+import { getSiteUrl } from "@/lib/site-url";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://waework.co";
+const SITE_URL = getSiteUrl();
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [

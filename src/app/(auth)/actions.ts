@@ -21,7 +21,9 @@ export async function signUp(
   }
 
   const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ?? (await headers()).get("origin") ?? "";
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    (await headers()).get("origin") ||
+    "";
 
   const intendedRole = formData.get("role");
   const supabase = await createClient();

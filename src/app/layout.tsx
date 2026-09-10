@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import localFont from "next/font/local";
+import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 // Sofia Pro is the intended heading font but is commercial (Adobe Fonts /
@@ -26,9 +27,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://waework.co"
-  ),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "WaeWork — Hire Verified Remote Talent, Worldwide",
     template: "%s",
