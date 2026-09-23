@@ -23,7 +23,7 @@ export function DemoShell({
         <div className="flex items-center gap-3 text-sm">
           <div className="text-right">
             <p className="font-semibold text-ink-navy">{name}</p>
-            <p className="text-ink-navy/60">{subtitle}</p>
+            <p className="text-ink-navy/70">{subtitle}</p>
           </div>
           <Link
             href="/demo"

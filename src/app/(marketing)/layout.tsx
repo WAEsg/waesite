@@ -8,9 +8,9 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="marketing-dark relative flex min-h-full flex-1 flex-col bg-abyss text-frost">
+    <div className="relative flex min-h-full flex-1 flex-col bg-paper-white text-ink-navy">
       <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-deep-navy/40 via-abyss to-abyss"
+        className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-cloud-blue/50 via-paper-white to-paper-white"
         aria-hidden="true"
       />
       <SiteNav />

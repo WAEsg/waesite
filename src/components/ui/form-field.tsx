@@ -4,12 +4,14 @@ export function FormField({
   type = "text",
   required = true,
   autoComplete,
+  defaultValue,
 }: {
   label: string;
   name: string;
   type?: string;
   required?: boolean;
   autoComplete?: string;
+  defaultValue?: string;
 }) {
   return (
     <label className="block text-sm font-semibold text-ink-navy">
@@ -19,7 +21,8 @@ export function FormField({
         type={type}
         required={required}
         autoComplete={autoComplete}
-        className="mt-1 w-full rounded-xl border border-ink-navy/15 bg-paper-white px-4 py-2.5 text-base font-normal text-ink-navy outline-none transition focus:border-voyage-blue focus:ring-2 focus:ring-passport-sky/40"
+        defaultValue={defaultValue}
+        className="mt-1 min-h-[50px] w-full rounded-[10px] border-[1.5px] border-field-line bg-white px-4 py-3 text-base font-normal text-ink-navy outline-none transition hover:border-voyage-blue focus:border-voyage-blue focus:ring-4 focus:ring-passport-sky/[0.22]"
       />
     </label>
   );
@@ -36,7 +39,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-xl bg-voyage-blue px-4 py-2.5 font-semibold text-paper-white transition hover:bg-voyage-blue/90 disabled:opacity-60"
+      className="inline-flex min-h-12 w-full items-center justify-center gap-2.5 rounded-full border-[1.5px] border-voyage-blue bg-voyage-blue px-[22px] py-3 font-extrabold text-white shadow-[0_6px_18px_rgba(30,79,163,0.26)] transition-transform duration-200 hover:-translate-y-0.5 hover:border-voyage-blue-700 hover:bg-voyage-blue-700 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
     >
       {pending ? "Please wait…" : children}
     </button>
@@ -46,7 +49,7 @@ export function SubmitButton({
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
   return (
-    <p className="rounded-xl bg-error/10 px-4 py-2.5 text-sm font-medium text-error">
+    <p className="rounded-lg bg-error-bg px-4 py-3 text-sm font-bold text-error">
       {message}
     </p>
   );

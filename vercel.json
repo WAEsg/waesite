@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/auto-approve-milestones",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/day15-checkin-reminder",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/interview-decision-reminder",
+      "schedule": "0 4 * * *"
+    }
+  ]
+}

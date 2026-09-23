@@ -1,76 +1,65 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { completeOnboarding, type OnboardingActionState } from "./actions";
-import { FormField, FormError, SubmitButton } from "@/components/ui/form-field";
+import { FormError, SubmitButton } from "@/components/ui/form-field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { useRolePreference } from "@/lib/use-role-preference";
 
 const initialState: OnboardingActionState = { error: null };
+const fieldClasses =
+  "mt-1.5 min-h-[50px] w-full rounded-[10px] border-[1.5px] border-field-line bg-white px-4 py-3 text-base text-ink-navy outline-none transition hover:border-voyage-blue focus:border-voyage-blue focus:ring-4 focus:ring-passport-sky/[0.22]";
 
-const roles = [
-  {
-    value: "hirer",
-    title: "I'm hiring",
-    description: "Post gigs and retainers, browse vetted talent.",
-  },
-  {
-    value: "talent",
-    title: "I'm looking for work",
-    description: "Apply to roles and manage your contracts.",
-  },
-] as const;
+export function OnboardingForm({ defaultRole = null }: { defaultRole?: "hirer" | "talent" | null }) {
+  const [state, formAction, pending] = useActionState(completeOnboarding, initialState);
+  const [role, setRole] = useRolePreference();
+  const [localRole] = useState(role ?? defaultRole);
 
-export function OnboardingForm({
-  defaultRole = null,
-}: {
-  defaultRole?: "hirer" | "talent" | null;
-}) {
-  const [state, formAction, pending] = useActionState(
-    completeOnboarding,
-    initialState
-  );
-  const [role, setRole] = useState<"hirer" | "talent" | null>(defaultRole);
+  // If the site-wide role preference was never set (e.g. the visitor
+  // jumped straight to /onboarding), seed it from what step 1 recorded.
+  const current = role ?? localRole;
 
   return (
-    <form action={formAction} className="mt-6 space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2">
-        {roles.map((option) => (
-          <label
-            key={option.value}
-            className={`cursor-pointer rounded-2xl border-2 p-4 transition ${
-              role === option.value
-                ? "border-voyage-blue bg-cloud-blue"
-                : "border-ink-navy/10 hover:border-passport-sky/60"
-            }`}
-          >
-            <input
-              type="radio"
-              name="role"
-              value={option.value}
-              required
-              defaultChecked={defaultRole === option.value}
-              className="sr-only"
-              onChange={() => setRole(option.value)}
-            />
-            <span className="block font-display font-semibold text-ink-navy">
-              {option.title}
-            </span>
-            <span className="mt-1 block text-sm text-ink-navy/70">
-              {option.description}
-            </span>
-          </label>
-        ))}
+    <form action={formAction} className="flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-slate">Signing up as</span>
+        <SegmentedControl
+          options={[
+            { value: "hirer", label: "Hirer" },
+            { value: "talent", label: "Talent Partner" },
+          ]}
+          value={current}
+          onChange={setRole}
+          className="!w-fit !bg-cloud-blue"
+        />
+        <input type="hidden" name="role" value={current ?? ""} />
       </div>
 
-      <FormField label="Full name" name="full_name" autoComplete="name" />
+      <label className="flex flex-col font-extrabold text-ink-navy">
+        Full name
+        <input name="full_name" required autoComplete="name" className={fieldClasses} />
+      </label>
 
-      <FormField label="Country" name="country" autoComplete="country-name" />
+      <label className="flex flex-col font-extrabold text-ink-navy">
+        Country
+        <input name="country" required autoComplete="country-name" className={fieldClasses} />
+      </label>
 
-      {role === "hirer" && (
-        <FormField label="Business name" name="business_name" />
+      {current === "hirer" && (
+        <label className="flex flex-col font-extrabold text-ink-navy">
+          Business name
+          <input name="business_name" required className={fieldClasses} />
+        </label>
       )}
 
       <FormError message={state.error} />
-      <SubmitButton pending={pending}>Continue</SubmitButton>
+      <SubmitButton pending={pending}>
+        <span className="flex items-center justify-center gap-2.5">
+          Continue
+          <ArrowRight className="h-4 w-4" aria-hidden />
+        </span>
+      </SubmitButton>
     </form>
   );
 }

@@ -1,20 +1,23 @@
 export const navLinks = [
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "For Hirers", href: "/for-hirers" },
-  { label: "For Talent", href: "/for-talent" },
+  { label: "How it works", href: "/how-it-works" },
+  { label: "For hirers", href: "/for-hirers" },
+  { label: "For talent", href: "/for-talent" },
   { label: "AI Staffing", href: "/#ai-staffing", badge: "Early Access" },
   { label: "Pricing", href: "/pricing" },
-  { label: "About", href: "/about" },
+  { label: "FAQ", href: "/faq" },
 ];
 
 export const footerLinks = [
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  { label: "About", href: "/about" },
 ];
 
 export const footerHireAtScale = {
-  label: "Looking to hire at scale? Get in touch",
-  href: "/contact",
+  heading: "Hiring at scale?",
+  blurb: "Building a whole team, not one role? We'll set it up with you.",
+  label: "Get in touch",
+  href: "/contact?topic=scale",
 };
 
 // The five value props behind every headline on the site — speed, elastic
@@ -67,90 +70,6 @@ export const howItWorksSteps = [
   },
 ];
 
-export const trustPillars = [
-  {
-    title: "Identity verification, both sides",
-    description:
-      "Every hirer and every Talent Partner is verified through Stripe Identity before they can post a role or apply to one — so you always know who you're working with.",
-  },
-  {
-    title: "Payment protection that matches the work",
-    description:
-      "For an ongoing Team Extension, funds are held and released every 15 days — partial at day 15, the rest at day 30 — so neither side is exposed to a full month of risk. For project-based work, release is tied to agreed milestones instead.",
-  },
-  {
-    title: "A backup bench, just in case",
-    description:
-      "For every placement, we keep a shortlisted backup candidate on file for the first 90 days — so if something falls through early on, you're not starting the search from zero.",
-  },
-  {
-    title: "Replacement guarantee & a clear MIA protocol",
-    description:
-      "If a Talent Partner goes unresponsive, a defined response window kicks in automatically — no ambiguity about what happens next. If it doesn't work out early on, we'll help place a replacement.",
-  },
-  {
-    title: "Neutral dispute resolution",
-    description:
-      "If a hirer and Talent Partner disagree on delivered work, our support team mediates fairly for both sides — this is a service everyone on WaeWork is covered by, not a deduction against either party.",
-  },
-];
-
-// Applies to an ongoing Team Extension only — project-based work uses
-// pricingGigFee below instead, with no separate placement fee.
-export const pricingPlacementFee = {
-  title: "Placement fee",
-  amount: "One month's pay",
-  description:
-    "Charged to the client only, upon successful match. Talent pays nothing.",
-};
-
-export const pricingTiers = [
-  { period: "Months 2–6", clientShare: "8%", talentShare: "4%", combined: "12%" },
-  { period: "Months 7–12", clientShare: "5.5%", talentShare: "2.5%", combined: "8%" },
-  { period: "Month 13+", clientShare: "4%", talentShare: "2%", combined: "6%" },
-];
-
-export const pricingFeeFloor =
-  "The above percentage, or S$45/month combined, whichever is greater.";
-
-export const pricingBuyout =
-  "Buy-out option available after month 12 for a fully direct relationship with your Talent Partner — no ongoing platform fee.";
-
-export const pricingTalentPromise =
-  "Talent never pays to join or apply — only a small service fee once work is underway, which funds verification, backup coverage, and dispute support.";
-
-// Project-based work has no placement fee — the platform fee is a flat
-// cut of the project, taken from milestone releases as they happen.
-export const pricingGigFee = {
-  title: "Project & gig fee",
-  rate: "15%",
-  clientShare: "10%",
-  talentShare: "5%",
-  description:
-    "Of total project value, split between client and talent and taken from milestone releases. No separate placement fee for project-based work.",
-};
-
-export const pricingSubscriptionTiers = [
-  {
-    name: "Starter",
-    price: "S$79/month",
-    description: "Limited postings, standard matching.",
-  },
-  {
-    name: "Growth",
-    price: "S$149/month",
-    description: "Unlimited postings, priority matching, dedicated support.",
-  },
-];
-
-export const pricingUrgentAddon = {
-  title: "Urgent priority",
-  price: "S$50–100",
-  description: "Flat rush fee for expedited (24–48hr) matching.",
-  disclaimer:
-    "*Urgent priority is subject to available talent. If we're unable to find a suitable match, we'll let you know.",
-};
-
 export const faqItems = [
   {
     question: "How does WaeWork verify hirers and talent?",
@@ -195,14 +114,14 @@ export const faqItems = [
 ];
 
 export const footerContact = {
-  email: "hello@waework.co",
+  email: "hello@waework.com",
   location: "Headquartered in Singapore",
 };
 
 // "Meet Your AI Workforce" — a complementary, early-access offering
 // alongside human Talent Partners. Deliberately routed to a lightweight
 // interest form rather than the full hiring flow used for human roles.
-export const aiWorkforceHeading = "Meet Your AI Workforce";
+export const aiWorkforceHeading = "Meet your AI workforce";
 
 export const aiWorkforceIntro =
   "Some work doesn't need a human — it just needs to get done, instantly, every time. WaeWork now offers AI-powered staff alongside your human team, ready to work around the clock at a fraction of the cost.";

@@ -32,7 +32,7 @@ export async function submitAiWorkforceInterest(
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL ?? "hello@waework.co";
+  const to = process.env.CONTACT_TO_EMAIL ?? "hello@waework.com";
 
   if (!apiKey) {
     return {

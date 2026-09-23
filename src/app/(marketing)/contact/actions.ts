@@ -15,9 +15,11 @@ export async function submitContact(
     return { status: "error", message: "Verification failed — please try again." };
   }
 
+  const topicRaw = formData.get("topic");
   const parsed = contactSchema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
+    topic: typeof topicRaw === "string" && topicRaw ? topicRaw : undefined,
     message: formData.get("message"),
   });
 
@@ -26,7 +28,7 @@ export async function submitContact(
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL ?? "hello@waework.co";
+  const to = process.env.CONTACT_TO_EMAIL ?? "hello@waework.com";
 
   if (!apiKey) {
     return {
@@ -40,7 +42,7 @@ export async function submitContact(
     from: "WaeWork Contact <onboarding@resend.dev>",
     to,
     replyTo: parsed.data.email,
-    subject: `New contact form message from ${parsed.data.name}`,
+    subject: `New contact form message from ${parsed.data.name}${parsed.data.topic ? ` — ${parsed.data.topic}` : ""}`,
     text: parsed.data.message,
   });
 

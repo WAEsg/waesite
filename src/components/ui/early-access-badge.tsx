@@ -1,3 +1,6 @@
+// Matches the prototype's `.chip.chip--early` exactly — amber, not blue:
+// font-mono, bold, uppercase, an inset amber-line ring instead of a solid
+// border, on the amber-bg fill.
 export function EarlyAccessBadge({
   className = "",
   compact = false,
@@ -7,8 +10,8 @@ export function EarlyAccessBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap rounded-full border border-passport-sky/30 bg-passport-sky/10 font-semibold text-passport-sky ${
-        compact ? "px-1.5 py-0.5 text-[10px]" : "px-2.5 py-1 text-xs"
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-alert-bg font-mono font-bold tracking-[0.08em] text-alert uppercase shadow-[inset_0_0_0_1px_#F5C56B] ${
+        compact ? "px-2 py-0.5 text-[0.625rem]" : "px-[11px] py-[5px] text-[0.6875rem]"
       } ${className}`}
     >
       Early Access

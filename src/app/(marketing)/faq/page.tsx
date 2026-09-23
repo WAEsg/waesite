@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { FaqSection } from "@/components/landing/faq-section";
+import { FaqPageContent } from "@/components/landing/faq-page-content";
+import { FaqStillStuck } from "@/components/landing/faq-still-stuck";
 import { FaqJsonLd } from "@/components/seo/json-ld";
+import { WhereToNextSection } from "@/components/landing/where-to-next-section";
 
 export const metadata: Metadata = {
   title: "FAQ | WaeWork",
@@ -10,14 +12,19 @@ export const metadata: Metadata = {
 
 export default function FaqPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16">
+    <div>
       <FaqJsonLd />
-      <h1 className="text-center font-display text-3xl font-bold text-frost sm:text-4xl">
-        Frequently asked questions
-      </h1>
-      <div className="mt-10">
-        <FaqSection />
-      </div>
+      <FaqPageContent />
+      <FaqStillStuck />
+      <WhereToNextSection
+        heading="Got your answer? Pick your side."
+        subheading="Tell us which side you're on and we'll take you to the right sign-up. Pricing is one click away too."
+        cards={[
+          { label: "I'm hiring", description: "Post a role and get matched with verified talent.", href: "/signup?role=hirer" },
+          { label: "I'm looking for work", description: "Free to join. Get matched with verified hirers.", href: "/signup?role=talent" },
+          { label: "See pricing", description: "Every fee, plan and add-on on one page.", href: "/pricing" },
+        ]}
+      />
     </div>
   );
 }

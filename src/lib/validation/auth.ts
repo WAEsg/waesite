@@ -10,6 +10,14 @@ export const logInSchema = z.object({
   password: z.string().min(1, "Enter your password."),
 });
 
+export const requestPasswordResetSchema = z.object({
+  email: z.string().trim().email("Enter a valid email address."),
+});
+
+export const updatePasswordSchema = z.object({
+  password: z.string().min(8, "Password must be at least 8 characters."),
+});
+
 export const onboardingSchema = z.object({
   role: z.enum(["hirer", "talent"], {
     error: "Choose whether you're hiring or looking for work.",

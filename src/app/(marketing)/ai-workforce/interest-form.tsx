@@ -4,19 +4,20 @@ import { Suspense, useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { submitAiWorkforceInterest, type AiWorkforceActionState } from "./actions";
 import { TurnstileWidget } from "@/components/forms/turnstile-widget";
-import { buttonPrimaryDark, neumorphicInset } from "@/components/ui/glass";
+import { neumorphicInsetLight } from "@/components/ui/glass";
+import { buttonPrimary } from "@/components/ui/button-classes";
 import { aiWorkforceRoles } from "@/lib/landing-data";
 
 const initialState: AiWorkforceActionState = { status: "idle", message: null };
 
-const fieldClasses = `mt-1 w-full min-h-11 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-base text-frost placeholder:text-mist/50 outline-none transition focus:border-passport-sky focus:ring-2 focus:ring-passport-sky/40 ${neumorphicInset}`;
+const fieldClasses = `mt-1 w-full min-h-11 rounded-xl border border-ink-navy/10 bg-voyage-blue/[0.04] px-4 py-2.5 text-base text-ink-navy placeholder:text-ink-navy/40 outline-none transition focus:border-voyage-blue focus:ring-2 focus:ring-passport-sky/40 ${neumorphicInsetLight}`;
 
 function RoleInterestField() {
   const searchParams = useSearchParams();
   const preselected = searchParams.get("role") ?? "";
 
   return (
-    <label className="block text-sm font-semibold text-frost">
+    <label className="block text-sm font-semibold text-ink-navy">
       Which AI role interests you? (optional)
       <select name="role_interest" defaultValue={preselected} className={fieldClasses}>
         <option value="">Not sure yet</option>
@@ -46,15 +47,15 @@ export function AiWorkforceInterestForm() {
 
   return (
     <form action={formAction} className="space-y-4">
-      <label className="block text-sm font-semibold text-frost">
+      <label className="block text-sm font-semibold text-ink-navy">
         Business name
         <input name="business_name" required className={fieldClasses} />
       </label>
-      <label className="block text-sm font-semibold text-frost">
+      <label className="block text-sm font-semibold text-ink-navy">
         Your name
         <input name="contact_name" required className={fieldClasses} />
       </label>
-      <label className="block text-sm font-semibold text-frost">
+      <label className="block text-sm font-semibold text-ink-navy">
         Email
         <input name="email" type="email" required className={fieldClasses} />
       </label>
@@ -63,7 +64,7 @@ export function AiWorkforceInterestForm() {
         <RoleInterestField />
       </Suspense>
 
-      <label className="block text-sm font-semibold text-frost">
+      <label className="block text-sm font-semibold text-ink-navy">
         What&apos;s eating up your time?
         <textarea
           name="pain_point"
@@ -87,7 +88,7 @@ export function AiWorkforceInterestForm() {
         </p>
       )}
 
-      <button type="submit" disabled={pending} className={`${buttonPrimaryDark} w-full disabled:opacity-60`}>
+      <button type="submit" disabled={pending} className={`${buttonPrimary} w-full disabled:opacity-60`}>
         {pending ? "Sending…" : "Join Waitlist"}
       </button>
     </form>

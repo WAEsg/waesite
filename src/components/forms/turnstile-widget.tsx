@@ -17,7 +17,7 @@ export function TurnstileWidget() {
         async
         defer
       />
-      <div className="cf-turnstile" data-sitekey={siteKey} data-theme="dark" />
+      <div className="cf-turnstile" data-sitekey={siteKey} data-theme="light" />
     </>
   );
 }

@@ -1,24 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  /* WaeWork brand palette */
+  /* WaeWork brand palette — exact values from the prototype's :root
+     (voyage/deep/ink/sky/paper/mist/line already matched; cloud/frost
+     were previously approximated and are now exact). */
   --color-voyage-blue: #1e4fa3;
+  --color-voyage-blue-700: #183f84;
   --color-passport-sky: #4a90e2;
-  --color-cloud-blue: #eaf3ff;
+  --color-cloud-blue: #e4eefd;
   --color-paper-white: #fbfcfe;
   --color-ink-navy: #172b4d;
+  /* Secondary/muted body text — a distinct blue-gray, not an
+     opacity-blended ink-navy. This is the single biggest visual gap
+     found against the prototype: nearly every "muted" paragraph site-wide
+     should use this color, not text-ink-navy/70. */
+  --color-slate: #4b5c7b;
+  --color-line: #dce7f7;
+  --color-field-line: #6f86ad;
 
   /* Dark glassmorphic surface — used by the marketing site */
   --color-abyss: #0a1628;
   --color-deep-navy: #0f2a5c;
-  --color-frost: #f5f8ff;
-  /* Lighter blue for body copy on dark — frost/paper-white stay heading-only */
+  --color-frost: #f2f6fd;
   --color-mist: #c9ddf7;
 
   /* Functional only — never used as brand accents */
-  --color-success: #2fae66;
-  --color-alert: #f5a623;
-  --color-error: #e5484d;
+  --color-success: #17753f;
+  --color-success-bg: #e5f6ec;
+  --color-alert: #9a5b00;
+  --color-alert-bg: #fff3dc;
+  --color-alert-line: #f5c56b;
+  --color-error: #c8343a;
+  --color-error-bg: #fdecec;
+
+  --shadow-1: 0 1px 2px rgba(15, 42, 92, 0.06), 0 4px 14px rgba(15, 42, 92, 0.06);
+  --shadow-2: 0 2px 4px rgba(15, 42, 92, 0.06), 0 16px 40px rgba(15, 42, 92, 0.13);
+
+  /* Section-heading scale — exact clamp() values from the prototype's
+     --fs-display/--fs-h2/--fs-h3/--fs-lede. Section h2s in particular were
+     rendering meaningfully smaller than the source (text-3xl tops out at
+     30px; the prototype's h2 reaches 41.6px on desktop). */
+  --text-display: clamp(2.4rem, 4.6vw + 1rem, 4.4rem);
+  --text-h2: clamp(1.7rem, 2.2vw + 1rem, 2.6rem);
+  --text-h3: 1.25rem;
+  --text-lede: clamp(1.0625rem, 0.45vw + 1rem, 1.25rem);
 
   --background: var(--color-paper-white);
   --foreground: var(--color-ink-navy);
@@ -29,23 +54,42 @@
   --color-foreground: var(--foreground);
 
   --color-voyage-blue: var(--color-voyage-blue);
+  --color-voyage-blue-700: var(--color-voyage-blue-700);
   --color-passport-sky: var(--color-passport-sky);
   --color-cloud-blue: var(--color-cloud-blue);
   --color-paper-white: var(--color-paper-white);
   --color-ink-navy: var(--color-ink-navy);
+  --color-slate: var(--color-slate);
+  --color-line: var(--color-line);
+  --color-field-line: var(--color-field-line);
   --color-abyss: var(--color-abyss);
   --color-deep-navy: var(--color-deep-navy);
   --color-frost: var(--color-frost);
   --color-mist: var(--color-mist);
   --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
   --color-alert: var(--color-alert);
+  --color-alert-bg: var(--color-alert-bg);
+  --color-alert-line: var(--color-alert-line);
   --color-error: var(--color-error);
+  --color-error-bg: var(--color-error-bg);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+
+  --text-display: var(--text-display);
+  --text-h2: var(--text-h2);
+  --text-h3: var(--text-h3);
+  --text-lede: var(--text-lede);
 
   --font-sans: var(--font-nunito);
   --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 
+  --radius-sm: 0.625rem;
+  --radius-md: 1rem;
   --radius-xl: 1.25rem;
-  --radius-2xl: 1.75rem;
+  --radius-2xl: 1.5rem;
 }
 
 body {
@@ -63,15 +107,326 @@ h6 {
   font-family: var(--font-display), var(--font-sans), sans-serif;
 }
 
-/* Soft glow to lift headings off the dark background — subtle, not neon. */
+/* Icon-in-square badge used throughout cards/feature rows — the parent
+   ".card-hover"/group lifts and re-colors it on hover, matching the
+   prototype's ".card--lift:hover .badge-ico" pattern exactly. */
+.badge-ico {
+  transition:
+    transform 0.5s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)),
+    background-color 0.3s;
+}
+.card-hover:hover .badge-ico {
+  transform: rotate(-8deg) scale(1.08);
+  background-color: var(--color-voyage-blue);
+  color: #fff;
+}
+
+/* Step-card top divider — a full-width gray track with a voyage-blue
+   fill that grows in (scaleX 0 -> 1) once the step reveals, matching
+   ".step::before"/".step::after" exactly. */
+.step-divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--color-line);
+}
+.step-divider__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  border-radius: 3px;
+  background: var(--color-voyage-blue);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  transition-delay: var(--d, 0ms);
+}
+[data-reveal].is-in .step-divider__fill {
+  transform: scaleX(1);
+}
+
+/* Soft glow to lift headings off a dark surface — only the retained dark
+   accent (the footer) still uses .marketing-dark; subtle, not neon. */
 .marketing-dark h1,
 .marketing-dark h2,
 .marketing-dark h3 {
   text-shadow: 0 0 40px rgba(245, 248, 255, 0.2), 0 0 80px rgba(74, 144, 226, 0.15);
 }
 
-/* Visible focus ring against the dark marketing theme (WCAG AA). */
-.marketing-dark :focus-visible {
+/* Visible focus ring, site-wide (WCAG AA) — not tied to a theme class,
+   since the site is light by default now. */
+:focus-visible {
   outline: 2px solid var(--color-passport-sky);
   outline-offset: 2px;
+}
+
+/* Hand-drawn headline-accent underline (see accent-underline.tsx) — draws
+   on via stroke-dashoffset, pathLength-normalized so it works regardless
+   of the accent phrase's actual width. */
+.waework-draw-underline {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: waework-draw-underline 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes waework-draw-underline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waework-draw-underline {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Scroll/mount reveal system (see reveal.tsx) — exact keyframes, easing,
+   and duration lifted from the prototype's [data-reveal]/.is-in system.
+   Elements start hidden and animate in once revealed; --d sets a
+   per-element stagger delay. */
+[data-reveal] {
+  opacity: 0;
+}
+
+[data-reveal].is-in {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  /* "both", not just "backwards" — the animated (opacity: 1) end state
+     must persist after the animation completes, or the element snaps
+     back to the base [data-reveal] opacity: 0 the instant it finishes. */
+  animation-fill-mode: both;
+  animation-delay: var(--d, 0ms);
+}
+
+[data-reveal="up"].is-in,
+[data-reveal=""].is-in {
+  animation-name: rv-up;
+}
+[data-reveal="fade"].is-in {
+  animation-name: rv-fade;
+}
+[data-reveal="left"].is-in {
+  animation-name: rv-left;
+}
+[data-reveal="right"].is-in {
+  animation-name: rv-right;
+}
+[data-reveal="scale"].is-in {
+  animation-name: rv-scale;
+}
+
+@keyframes rv-up {
+  0% {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rv-fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes rv-left {
+  0% {
+    opacity: 0;
+    transform: translateX(calc(clamp(16px, 4vw, 32px) * -1));
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rv-right {
+  0% {
+    opacity: 0;
+    transform: translateX(clamp(16px, 4vw, 32px));
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rv-scale {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+  }
+  [data-reveal].is-in {
+    animation: none;
+  }
+}
+
+/* Idle floating bob for illustrative mockup cards (see mockup-card.tsx) —
+   exact timing/keyframes lifted from the prototype's .float class. */
+.waework-float {
+  animation: waework-float 7s ease-in-out infinite;
+}
+
+@keyframes waework-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waework-float {
+    animation: none;
+  }
+}
+
+/* Pulsing "live" dot on the hero's Example match chip — exact keyframe
+   from the prototype's .dot-live::after / @keyframes ping. */
+.ww-dot-live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: inherit;
+  animation: ww-ping 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes ww-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+/* How-it-works hero "match vignette" — exact keyframes from the
+   prototype's hw-rise/hw-row/hw-slide/hw-fade/hw-pop/hw-thump/hw-impact/
+   hw-ring set (see how-it-works-hero.tsx for the timeline that drives
+   them via animationDelay). */
+@keyframes hw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hw-row {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hw-up {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hw-slide {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hw-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes hw-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hw-thump {
+  0% {
+    opacity: 0;
+    transform: scale(2.3);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.92);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hw-impact {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(3px) scale(0.992);
+  }
+}
+@keyframes hw-ring {
+  from {
+    opacity: 0.6;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ww-dot-live::after {
+    animation: none;
+  }
 }

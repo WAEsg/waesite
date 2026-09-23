@@ -18,5 +18,6 @@ export default async function DashboardIndexPage() {
     .eq("id", user.id)
     .single();
 
+  if (profile?.role === "admin") redirect("/dashboard/admin");
   redirect(profile?.role === "hirer" ? "/dashboard/hirer" : "/dashboard/talent");
 }

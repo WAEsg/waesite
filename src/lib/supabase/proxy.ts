@@ -3,10 +3,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/onboarding"];
 const AUTH_PAGES = ["/login", "/signup"];
+const VERIFY_PATH = "/onboarding/verify";
 
 // Called from src/proxy.ts (Next.js 16 renamed middleware.ts -> proxy.ts).
 // Refreshes the Supabase session cookie on every request and gates
-// protected routes / onboarding based on auth + role state.
+// protected routes / onboarding / verification based on auth + role +
+// verification state.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -54,16 +56,29 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Role/verification gating only applies to /dashboard — /onboarding and
+  // /onboarding/verify are the pages that GET you past these checks, so
+  // gating them here would redirect a page to itself (infinite loop).
+  // Each of those pages already redirects away on its own once it's no
+  // longer needed (role already set / already verified).
   if (user && pathname.startsWith("/dashboard")) {
     const { data: profile } = await supabase
       .from("users")
-      .select("role")
+      .select("role, verification_status")
       .eq("id", user.id)
       .single();
 
     if (!profile?.role) {
       const url = request.nextUrl.clone();
       url.pathname = "/onboarding";
+      return NextResponse.redirect(url);
+    }
+
+    // Admins are exempt — an internally-promoted team member isn't going
+    // through the same Stripe Identity flow a hirer/talent account uses.
+    if (profile.role !== "admin" && profile.verification_status !== "passed") {
+      const url = request.nextUrl.clone();
+      url.pathname = VERIFY_PATH;
       return NextResponse.redirect(url);
     }
   }

@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
-import localFont from "next/font/local";
+import { Nunito, Bricolage_Grotesque, B612_Mono } from "next/font/google";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
-// Sofia Pro is the intended heading font but is commercial (Adobe Fonts /
-// purchased kit only) — no license file has been provided, so per
-// instruction we fall back to General Sans (open-source, Fontshare),
-// self-hosted here rather than silently using a mismatched system font.
-// Swap this loader for Sofia Pro's own @font-face files if a licensed kit
-// is added later.
-const display = localFont({
+// Headline/display font — matches the prototype's exact font-family
+// (Bricolage Grotesque, weight 800 for h1s), a free Google Font, no
+// license concerns.
+const display = Bricolage_Grotesque({
   variable: "--font-display",
-  src: [
-    { path: "../fonts/general-sans-500.woff2", weight: "500", style: "normal" },
-    { path: "../fonts/general-sans-600.woff2", weight: "600", style: "normal" },
-    { path: "../fonts/general-sans-700.woff2", weight: "700", style: "normal" },
-  ],
+  subsets: ["latin"],
+  weight: "variable",
   fallback: ["ui-rounded", "system-ui", "sans-serif"],
 });
 
@@ -24,6 +17,15 @@ const nunito = Nunito({
   variable: "--font-nunito",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+});
+
+// Monospace font for route/code-style labels on illustrative mockup cards
+// (e.g. "SIN ··· MNL", "DAY 0 ··· DAY 30") — matches the prototype's
+// --font-mono exactly.
+const mono = B612_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -40,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${display.variable} ${nunito.variable} h-full antialiased`}
+      className={`${display.variable} ${nunito.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-paper-white text-ink-navy">
         {children}

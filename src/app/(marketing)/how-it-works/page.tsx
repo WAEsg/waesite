@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import { FlightPathSection } from "@/components/landing/flight-path-section";
-import { TrustSection } from "@/components/landing/trust-section";
+import { HowItWorksHero } from "@/components/landing/how-it-works-hero";
+import { HowItWorksSteps } from "@/components/landing/how-it-works-steps";
+import { HowItWorksPayment } from "@/components/landing/how-it-works-payment";
+import { HowItWorksProtect } from "@/components/landing/how-it-works-protect";
+import { HowItWorksFaqTeaser } from "@/components/landing/how-it-works-faq-teaser";
+import { WhereToNextSection } from "@/components/landing/where-to-next-section";
 
 export const metadata: Metadata = {
   title: "How It Works | WaeWork",
@@ -10,16 +14,25 @@ export const metadata: Metadata = {
 
 export default function HowItWorksPage() {
   return (
-    <div className="px-4 pb-16 pt-16 text-center">
-      <h1 className="font-display text-3xl font-bold text-frost sm:text-4xl">
-        How WaeWork works
-      </h1>
-      <p className="mx-auto mt-3 max-w-xl text-mist">
-        Three steps from posting a role to work starting, with protection
-        built in at every stage.
-      </p>
-      <FlightPathSection />
-      <TrustSection />
+    <div>
+      <HowItWorksHero />
+      <HowItWorksSteps />
+      <HowItWorksPayment />
+      <HowItWorksProtect />
+      <HowItWorksFaqTeaser />
+      <WhereToNextSection
+        heading="Start with one role, or one application"
+        subheading="Pick your side and we'll carry it through sign-up. Creating an account takes about a minute."
+        cards={[
+          { label: "I'm hiring", description: "Post a role and get matched with verified talent.", href: "/signup?role=hirer" },
+          { label: "I'm looking for work", description: "Free to join. Get matched with verified hirers.", href: "/signup?role=talent" },
+          {
+            label: "See pricing",
+            description: "Clear fees for ongoing roles and one-off projects. Talent never pays to join or apply.",
+            href: "/pricing",
+          },
+        ]}
+      />
     </div>
   );
 }

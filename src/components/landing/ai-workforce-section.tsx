@@ -1,77 +1,65 @@
 import Link from "next/link";
-import {
-  aiWorkforceFallback,
-  aiWorkforceHeading,
-  aiWorkforceIntro,
-  aiWorkforceRoles,
-  aiWorkforceWaitlistNote,
-} from "@/lib/landing-data";
-import { glassCard, glassCardHover, glowShadow } from "@/components/ui/glass";
+import { Sparkles } from "lucide-react";
+import { aiWorkforceHeading, aiWorkforceIntro, aiWorkforceRoles, aiStaffingFoundingMember } from "@/lib/landing-data";
+import { buttonPrimary, buttonSecondary } from "@/components/ui/button-classes";
 import { EarlyAccessBadge } from "@/components/ui/early-access-badge";
 import { AiRoleIcon } from "./ai-icons";
-import { AiStaffingPricing } from "./ai-staffing-pricing";
+import { Reveal } from "@/components/ui/reveal";
 
+// Matches the prototype's "hm-ai" band exactly: a teaser only — copy +
+// price + CTAs on the left, a single "Five AI teammates" roster card (not
+// a grid of individual cards) on the right. The full pricing table lives
+// on /ai-workforce, not here — the prototype's homepage band never shows
+// it either.
 export function AiWorkforceSection() {
   return (
-    <section id="ai-staffing" className="mx-auto max-w-5xl scroll-mt-24 px-4 py-16">
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-2.5">
-          <h2 className="font-display text-2xl font-bold text-frost sm:text-3xl">
-            {aiWorkforceHeading}
-          </h2>
-          <EarlyAccessBadge />
-        </div>
-        <p className="mx-auto mt-3 max-w-2xl text-mist">{aiWorkforceIntro}</p>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-mist/70">
-          {aiWorkforceWaitlistNote}
-        </p>
-      </div>
+    <section id="ai-staffing" className="scroll-mt-24 bg-cloud-blue/40 px-4 py-16">
+      <div className="mx-auto grid max-w-5xl gap-10 lg:grid-cols-2 lg:items-start">
+        <Reveal variant="up">
+          <div>
+            <EarlyAccessBadge />
+            <h2 className="mt-3 text-balance font-display text-h2 leading-[1.08] font-bold tracking-tight text-ink-navy">
+              {aiWorkforceHeading}
+            </h2>
+            <p className="mt-3 max-w-md text-slate">{aiWorkforceIntro}</p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {aiWorkforceRoles.map((role) => (
-          <div key={role.slug} className={`flex flex-col p-5 ${glassCard} ${glassCardHover}`}>
-            <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-white/[0.06] ${glowShadow}`}>
-              <AiRoleIcon icon={role.icon} />
+            <div className="mt-5 flex items-baseline gap-2">
+              <span className="font-mono text-xs font-bold tracking-[0.14em] text-slate uppercase">From</span>
+              <span className="font-display text-3xl font-extrabold text-ink-navy">
+                S$99<span className="text-base font-semibold text-slate">/month</span>
+              </span>
             </div>
-            <span className="mt-3 font-display font-semibold text-frost">
-              {role.title}
-            </span>
-            <p className="mt-1 flex-1 text-sm text-mist">{role.description}</p>
-            <Link
-              href={`/ai-workforce?role=${role.slug}`}
-              className="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-passport-sky transition hover:text-frost"
-            >
-              Get Early Access →
-            </Link>
+            <p className="mt-1 text-sm text-slate">{aiStaffingFoundingMember.label}.</p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/ai-workforce" className={buttonPrimary}>
+                See AI Staffing
+              </Link>
+              <Link href="/ai-workforce" className={buttonSecondary}>
+                Join the waitlist
+              </Link>
+            </div>
           </div>
-        ))}
+        </Reveal>
 
-        {/* Fallback card — visually distinct (dashed border, muted fill)
-            so it reads as open-ended, not another fixed role. */}
-        <div className="flex flex-col rounded-2xl border border-dashed border-white/15 bg-white/[0.02] p-5 text-center sm:text-left">
-          <p className="font-display font-semibold text-frost">
-            {aiWorkforceFallback.heading}
-          </p>
-          <p className="mt-1 flex-1 text-sm text-mist">{aiWorkforceFallback.body}</p>
-          <Link
-            href="/ai-workforce"
-            className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] px-4 text-sm font-semibold text-frost backdrop-blur-xl transition hover:border-passport-sky/50 sm:justify-start"
-          >
-            {aiWorkforceFallback.button}
-          </Link>
-        </div>
-      </div>
-
-      <div className="mt-10">
-        <h3 className="text-center font-display text-xl font-semibold text-frost">
-          AI Staffing plans
-        </h3>
-        <p className="mx-auto mt-1 max-w-md text-center text-sm text-mist">
-          Pay monthly for however much AI staffing your business needs.
-        </p>
-        <div className="mt-6">
-          <AiStaffingPricing />
-        </div>
+        <Reveal variant="right" delayMs={100}>
+          <div className="rounded-2xl border border-line bg-white p-5 shadow-1">
+            <p className="flex items-center gap-2 font-mono text-[0.6875rem] font-bold tracking-[0.12em] text-slate uppercase">
+              <Sparkles className="h-3.5 w-3.5 text-voyage-blue" aria-hidden />
+              Five AI teammates
+            </p>
+            <ul className="mt-2">
+              {aiWorkforceRoles.map((role) => (
+                <li key={role.slug} className="flex items-center gap-3 border-t border-line py-[9px] font-bold text-ink-navy">
+                  <span className="badge-ico flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-cloud-blue text-voyage-blue">
+                    <AiRoleIcon icon={role.icon} />
+                  </span>
+                  <span className="text-[0.9375rem]">{role.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

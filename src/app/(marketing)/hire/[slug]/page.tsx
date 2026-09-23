@@ -6,7 +6,8 @@ import {
   getClusterBySlug,
   getRoleBySlug,
 } from "@/lib/skills-data";
-import { buttonPrimaryDark, buttonSecondaryDark, glassCard } from "@/components/ui/glass";
+import { glassCardLight } from "@/components/ui/glass";
+import { buttonPrimary, buttonSecondary } from "@/components/ui/button-classes";
 
 export function generateStaticParams() {
   return allLongTailRoles.map((role) => ({ slug: role.slug }));
@@ -48,27 +49,27 @@ export default async function HireRolePage({
         </p>
       )}
 
-      <h1 className="mt-2 font-display text-3xl font-bold text-frost sm:text-4xl">
+      <h1 className="mt-2 font-display text-3xl font-bold text-ink-navy sm:text-4xl">
         Hire a {role.title}
       </h1>
-      <p className="mt-4 text-lg text-mist">{role.intro}</p>
+      <p className="mt-4 text-lg text-slate">{role.intro}</p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <Link href="/signup?role=hirer" className={buttonPrimaryDark}>
+        <Link href="/signup?role=hirer" className={buttonPrimary}>
           Post this role
         </Link>
-        <Link href="/for-hirers" className={buttonSecondaryDark}>
+        <Link href="/for-hirers" className={buttonSecondary}>
           See how hiring works
         </Link>
       </div>
 
-      <div className={`mt-10 p-6 sm:p-8 ${glassCard}`}>
-        <h2 className="font-display text-xl font-semibold text-frost">
+      <div className={`mt-10 p-6 sm:p-8 ${glassCardLight}`}>
+        <h2 className="font-display text-xl font-semibold text-ink-navy">
           What a {role.title.toLowerCase()} typically handles
         </h2>
         <ul className="mt-4 space-y-2">
           {role.commonTasks.map((task) => (
-            <li key={task} className="flex items-start gap-2 text-mist">
+            <li key={task} className="flex items-start gap-2 text-slate">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-passport-sky" />
               {task}
             </li>
@@ -77,10 +78,10 @@ export default async function HireRolePage({
       </div>
 
       <div className="mt-10">
-        <h2 className="font-display text-xl font-semibold text-frost">
+        <h2 className="font-display text-xl font-semibold text-ink-navy">
           Identity-verified, payment-protected
         </h2>
-        <p className="mt-2 text-mist">
+        <p className="mt-2 text-slate">
           Every {role.title.toLowerCase()} on WaeWork completes identity
           verification through Stripe Identity before they can apply. Funds
           are held via Stripe Connect and released on a schedule matched to
