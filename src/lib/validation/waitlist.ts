@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeUrl, isValidUrl } from "@/lib/url";
 
 // The "Founding Talent" pre-launch waitlist — deliberately more detailed
 // than the AI Workforce lead-capture form, since these fields (skill,
@@ -12,7 +13,8 @@ export const waitlistSignupSchema = z.object({
     .string()
     .trim()
     .min(1, "Add a portfolio or work sample link.")
-    .refine((v) => /^https?:\/\//.test(v), "Enter a full link starting with http:// or https://"),
+    .transform(normalizeUrl)
+    .refine(isValidUrl, "Enter a valid link, e.g. waework.com"),
   availability: z.string().trim().optional(),
   expected_rate: z.string().trim().optional(),
   intro_text: z.string().trim().max(600, "Keep it under 600 characters.").optional(),

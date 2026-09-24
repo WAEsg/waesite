@@ -6,6 +6,7 @@ import { submitWaitlistSignup, type WaitlistActionState } from "./actions";
 import { skillClusters } from "@/lib/skills-data";
 import { TurnstileWidget } from "@/components/forms/turnstile-widget";
 import { buttonPrimary } from "@/components/ui/button-classes";
+import { handleUrlBlur } from "@/lib/url";
 
 const initialState: WaitlistActionState = { status: "idle", message: null };
 const fieldClasses =
@@ -79,7 +80,15 @@ export function WaitlistForm() {
           <Required />
         </span>
         <span className="mb-1.5 text-sm font-normal text-slate">A Drive folder, site, or LinkedIn works fine.</span>
-        <input name="portfolio_link" type="url" required placeholder="https://" className={fieldClasses} />
+        <input
+          name="portfolio_link"
+          type="text"
+          inputMode="url"
+          required
+          placeholder="waework.com"
+          onBlur={handleUrlBlur}
+          className={fieldClasses}
+        />
       </label>
 
       <label className={labelClasses}>

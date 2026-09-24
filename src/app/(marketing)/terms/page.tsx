@@ -3,7 +3,6 @@ import ReactMarkdown from "react-markdown";
 import { ArrowRight, Briefcase, Clock, MessageCircle, Wallet } from "lucide-react";
 import { readLegalDocument, LEGAL_VERSIONS } from "@/lib/legal";
 import { EyebrowLabel } from "@/components/ui/eyebrow-label";
-import { LinkArrow } from "@/components/ui/link-arrow";
 import { WhereToNextSection } from "@/components/landing/where-to-next-section";
 
 export const metadata = { title: "Terms of Service — WaeWork" };

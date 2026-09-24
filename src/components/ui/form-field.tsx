@@ -1,3 +1,5 @@
+import { handleUrlBlur } from "@/lib/url";
+
 export function FormField({
   label,
   name,
@@ -5,6 +7,7 @@ export function FormField({
   required = true,
   autoComplete,
   defaultValue,
+  urlField = false,
 }: {
   label: string;
   name: string;
@@ -12,16 +15,22 @@ export function FormField({
   required?: boolean;
   autoComplete?: string;
   defaultValue?: string;
+  // Accepts protocol-less input ("waework.com") and prepends "https://"
+  // on blur instead of relying on native type="url", which rejects
+  // that input outright. See src/lib/url.ts.
+  urlField?: boolean;
 }) {
   return (
     <label className="block text-sm font-semibold text-ink-navy">
       {label}
       <input
         name={name}
-        type={type}
+        type={urlField ? "text" : type}
+        inputMode={urlField ? "url" : undefined}
         required={required}
         autoComplete={autoComplete}
         defaultValue={defaultValue}
+        onBlur={urlField ? handleUrlBlur : undefined}
         className="mt-1 min-h-[50px] w-full rounded-[10px] border-[1.5px] border-field-line bg-white px-4 py-3 text-base font-normal text-ink-navy outline-none transition hover:border-voyage-blue focus:border-voyage-blue focus:ring-4 focus:ring-passport-sky/[0.22]"
       />
     </label>

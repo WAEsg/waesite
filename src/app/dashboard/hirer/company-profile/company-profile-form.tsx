@@ -47,6 +47,7 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
           name="website"
           required={false}
           defaultValue={profile?.website ?? ""}
+          urlField
         />
       </div>
       <label className="block text-sm font-semibold text-ink-navy">

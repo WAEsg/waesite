@@ -81,6 +81,7 @@ export function TalentProfileForm({ profile }: { profile: Profile }) {
         name="resume_url"
         required={false}
         defaultValue={profile?.resume_url ?? ""}
+        urlField
       />
       <FormField
         label="Portfolio links (comma-separated)"

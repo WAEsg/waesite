@@ -1,11 +1,21 @@
 import { z } from "zod";
+import { normalizeUrl, isValidUrl } from "@/lib/url";
+
+// Optional "paste a link" field — accepts blank, and normalizes
+// protocol-less input (see src/lib/url.ts) before validating.
+const optionalUrl = z
+  .string()
+  .trim()
+  .optional()
+  .transform((v) => (v ? normalizeUrl(v) : v))
+  .refine((v) => !v || isValidUrl(v), "Enter a valid URL, e.g. waework.com");
 
 export const hirerProfileSchema = z.object({
   company_name: z.string().trim().min(1, "Enter your company name."),
   uen: z.string().trim().optional(),
   company_size: z.string().trim().optional(),
   industry: z.string().trim().optional(),
-  website: z.string().trim().url("Enter a valid URL.").optional().or(z.literal("")),
+  website: optionalUrl,
   description: z.string().trim().max(2000).optional(),
 });
 
@@ -17,6 +27,6 @@ export const talentProfileSchema = z.object({
   rate_unit: z.enum(["hourly", "monthly"]).optional(),
   years_experience: z.coerce.number().int().min(0).optional(),
   availability: z.string().trim().optional(),
-  resume_url: z.string().trim().url("Enter a valid URL.").optional().or(z.literal("")),
+  resume_url: optionalUrl,
   portfolio_links: z.string().trim().optional(),
 });
