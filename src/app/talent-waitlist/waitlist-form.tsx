@@ -14,6 +14,15 @@ const labelClasses = "flex flex-col font-extrabold text-ink-navy";
 
 const AVAILABILITY_OPTIONS = ["Full-time", "Part-time", "Project-based only", "Not sure yet"];
 
+function Required() {
+  return (
+    <span className="text-error" aria-hidden>
+      {" "}
+      *
+    </span>
+  );
+}
+
 export function WaitlistForm() {
   const [state, formAction, pending] = useActionState(submitWaitlistSignup, initialState);
 
@@ -32,17 +41,26 @@ export function WaitlistForm() {
   return (
     <form action={formAction} className="flex flex-col gap-5">
       <label className={labelClasses}>
-        Full name
+        <span>
+          Full name
+          <Required />
+        </span>
         <input name="full_name" required autoComplete="name" className={fieldClasses} />
       </label>
 
       <label className={labelClasses}>
-        Email
+        <span>
+          Email
+          <Required />
+        </span>
         <input name="email" type="email" required autoComplete="email" inputMode="email" className={fieldClasses} />
       </label>
 
       <label className={labelClasses}>
-        Skill category
+        <span>
+          Skill category
+          <Required />
+        </span>
         <select name="skill_category" required defaultValue="" className={fieldClasses}>
           <option value="" disabled>
             Choose the closest fit
@@ -56,7 +74,10 @@ export function WaitlistForm() {
       </label>
 
       <label className={labelClasses}>
-        Portfolio or work sample link
+        <span>
+          Portfolio or work sample link
+          <Required />
+        </span>
         <span className="mb-1.5 text-sm font-normal text-slate">A Drive folder, site, or LinkedIn works fine.</span>
         <input name="portfolio_link" type="url" required placeholder="https://" className={fieldClasses} />
       </label>
