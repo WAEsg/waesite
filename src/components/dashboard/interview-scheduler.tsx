@@ -36,8 +36,21 @@ function fmt(iso: string): string {
   return new Date(iso).toLocaleString("en-SG", { dateStyle: "medium", timeStyle: "short" });
 }
 
+// A bare `datetime-local` value carries no timezone (it's a wall-clock
+// string, e.g. "2026-09-25T14:00"). Submitted as-is, it would later be
+// written into the `confirmed_slot` timestamptz column and get silently
+// reinterpreted in the database session's UTC timezone instead of the
+// proposer's actual local time — shifting the stored instant by the
+// browser's UTC offset. Converting to a real UTC instant here, while we
+// still have the browser's own timezone to interpret the wall-clock
+// value against, is what keeps that instant correct end to end.
+function toUtcIso(localValue: string): string {
+  return localValue ? new Date(localValue).toISOString() : "";
+}
+
 function ProposeSlotsForm({ applicationId }: { applicationId: string }) {
   const [state, formAction, pending] = useActionState(proposeInterviewSlots, initialState);
+  const [values, setValues] = useState(["", "", ""]);
   return (
     <form action={formAction} className="space-y-3">
       <input type="hidden" name="application_id" value={applicationId} />
@@ -46,10 +59,14 @@ function ProposeSlotsForm({ applicationId }: { applicationId: string }) {
         <input
           key={i}
           type="datetime-local"
-          name="slot"
           required={i < 2}
+          value={values[i]}
+          onChange={(e) => setValues((prev) => prev.map((v, idx) => (idx === i ? e.target.value : v)))}
           className="w-full rounded-xl border border-line bg-paper-white px-4 py-2.5 text-sm text-ink-navy outline-none focus:border-voyage-blue"
         />
+      ))}
+      {values.map((v, i) => (
+        <input key={i} type="hidden" name="slot" value={toUtcIso(v)} />
       ))}
       <FormError message={state.error} />
       <button type="submit" disabled={pending} className={`${buttonPrimary} w-full disabled:opacity-60`}>
