@@ -73,6 +73,18 @@ export async function signUp(
       { user_id: data.user.id, document_type: "privacy", version: LEGAL_VERSIONS.privacy },
     ]);
     await trackEvent("signup_completed", data.user.id, { role: intendedRole ?? null });
+
+    // Waitlist conversion — only fires when this signup came from an
+    // invite link (?invite=<token>). Scoped to invite_token + still
+    // 'invited' so it can't be replayed against an already-converted row.
+    const inviteToken = formData.get("invite_token");
+    if (typeof inviteToken === "string" && inviteToken) {
+      await admin
+        .from("waitlist_signups")
+        .update({ status: "signed_up", converted_at: new Date().toISOString(), converted_user_id: data.user.id })
+        .eq("invite_token", inviteToken)
+        .eq("status", "invited");
+    }
   }
 
   redirect("/signup/check-email");

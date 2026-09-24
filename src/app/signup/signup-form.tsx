@@ -5,6 +5,7 @@ import { Suspense, useActionState, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArrowRight, IdCard, Lock } from "lucide-react";
 import { signUp, type AuthActionState } from "../(auth)/actions";
+import { lookupWaitlistInvite } from "../talent-waitlist/actions";
 import { FormError, SubmitButton } from "@/components/ui/form-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TurnstileWidget } from "@/components/forms/turnstile-widget";
@@ -36,12 +37,33 @@ function RoleFromQuery({ onDetect }: { onDetect: (role: "hirer" | "talent") => v
   return null;
 }
 
+// Reads ?invite=<token> (from a waitlist invite email), looks up that
+// row server-side to pre-fill the email field — so accepting an invite
+// is a one-field form, not a blank one — and passes the token through so
+// signUp() can mark that waitlist row converted. Deliberately doesn't
+// put the email itself in the URL; the token is the only thing that
+// needs to travel, same trust model as an email confirmation link.
+function InviteFromQuery({ onDetect }: { onDetect: (email: string, token: string) => void }) {
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const token = searchParams.get("invite");
+    if (!token) return;
+    lookupWaitlistInvite(token).then((result) => {
+      if (result) onDetect(result.email, token);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+}
+
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(signUp, initialState);
   const [role, setRole] = useRolePreference();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [roleTouched, setRoleTouched] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteToken, setInviteToken] = useState("");
   const level = useMemo(() => strength(password), [password]);
 
   useEffect(() => {
@@ -52,9 +74,23 @@ export function SignupForm() {
     <>
       <Suspense fallback={null}>
         <RoleFromQuery onDetect={setRole} />
+        <InviteFromQuery
+          onDetect={(email, token) => {
+            setInviteEmail(email);
+            setInviteToken(token);
+            setRole("talent");
+          }}
+        />
       </Suspense>
 
+      {inviteToken && (
+        <p className="mb-4 rounded-lg bg-success-bg px-4 py-3 text-sm font-bold text-success">
+          You&apos;re accepting a Founding Talent invite — just set a password to finish.
+        </p>
+      )}
+
       <form action={formAction} className="flex flex-col gap-5">
+        <input type="hidden" name="invite_token" value={inviteToken} />
         <div className="flex flex-col gap-2">
           <span className="font-extrabold text-ink-navy">First, which are you?</span>
           <SegmentedControl
@@ -86,6 +122,7 @@ export function SignupForm() {
         <label className="flex flex-col font-extrabold text-ink-navy">
           Email
           <input
+            key={inviteEmail || "no-invite"}
             id="signup-email"
             name="email"
             type="email"
@@ -95,7 +132,9 @@ export function SignupForm() {
             autoCapitalize="none"
             spellCheck={false}
             placeholder="name@company.com"
-            className={fieldClasses}
+            defaultValue={inviteEmail}
+            readOnly={Boolean(inviteEmail)}
+            className={`${fieldClasses} ${inviteEmail ? "bg-frost" : ""}`}
           />
         </label>
 

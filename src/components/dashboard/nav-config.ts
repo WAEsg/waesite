@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   UserCog,
   FileText,
+  ListChecks,
 } from "lucide-react";
 
 export type NavItem = {
@@ -69,6 +70,7 @@ export const adminNav: NavItem[] = [
   { label: "Contracts", href: "/dashboard/admin/contracts", icon: FileSignature },
   { label: "Disputes & MIA", href: "/dashboard/admin/disputes", icon: AlertTriangle },
   { label: "AI Staffing", href: "/dashboard/admin/ai-staffing", icon: Sparkles },
+  { label: "Waitlist", href: "/dashboard/admin/waitlist", icon: ListChecks },
   { label: "Team", href: "/dashboard/admin/team", icon: UserCog },
   { label: "Revenue", href: "/dashboard/admin/revenue", icon: FileText },
 ];

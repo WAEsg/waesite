@@ -12,6 +12,8 @@ import { runMilestoneAutoApprove } from "@/lib/milestones/auto-approve";
 export type AdminActionState = { error: string | null };
 const ok: AdminActionState = { error: null };
 
+export type WaitlistInviteActionState = { error: string | null; message: string | null };
+
 async function requireAdmin() {
   const supabase = await createClient();
   const {
@@ -199,4 +201,63 @@ export async function adminReviewOverdueMilestones() {
   await requireAdmin();
   await runMilestoneAutoApprove();
   revalidatePath("/dashboard/admin/contracts");
+}
+
+// ============================================================
+// Founding Talent waitlist — invite everyone still awaiting an invite
+// ============================================================
+
+// Idempotent by design: only rows still `status = 'waitlisted'` get
+// touched, so re-running this after someone's already been invited
+// never double-emails them. Each person gets their own invite_token
+// (rather than reusing a batch token) so /signup?invite=<token> can look
+// up exactly one waitlist row to pre-fill and later mark converted.
+export async function sendWaitlistInvites(
+  _prevState: WaitlistInviteActionState,
+  _formData: FormData
+): Promise<WaitlistInviteActionState> {
+  const { user } = await requireAdmin();
+
+  const admin = createAdminClient();
+  const { data: pending, error: fetchError } = await admin
+    .from("waitlist_signups")
+    .select("id, full_name, email")
+    .eq("status", "waitlisted");
+
+  if (fetchError) {
+    return { error: "Couldn't load the waitlist. Try again.", message: null };
+  }
+  if (!pending || pending.length === 0) {
+    return { error: null, message: "Nobody's waiting on an invite right now." };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://waework.com";
+  const now = new Date().toISOString();
+
+  for (const row of pending) {
+    const inviteToken = crypto.randomUUID();
+    await admin
+      .from("waitlist_signups")
+      .update({ invite_token: inviteToken, invite_sent_at: now, status: "invited" })
+      .eq("id", row.id);
+
+    await sendEmail({
+      to: row.email,
+      subject: "You're invited — complete your WaeWork profile",
+      heading: "You're up, Founding Talent",
+      body: `Hi ${row.full_name}, we're opening up matching to the Founding Talent waitlist — including you. Finish setting up your profile to be considered for upcoming roles.`,
+      ctaLabel: "Complete your profile",
+      ctaUrl: `${siteUrl}/signup?role=talent&invite=${inviteToken}`,
+    });
+
+    await logAuditEntry({
+      adminId: user.id,
+      action: "waitlist_invite_sent",
+      targetType: "waitlist_signups",
+      targetId: row.id,
+    });
+  }
+
+  revalidatePath("/dashboard/admin/waitlist");
+  return { error: null, message: `Sent ${pending.length} invite${pending.length === 1 ? "" : "s"}.` };
 }

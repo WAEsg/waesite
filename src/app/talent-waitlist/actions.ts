@@ -70,3 +70,22 @@ export async function submitWaitlistSignup(
     message: "You're on the Founding Talent waitlist — we'll email you when invites go out.",
   };
 }
+
+// Called from the signup page when it's loaded via a waitlist invite
+// link (?invite=<token>), to pre-fill the email field. Only returns a
+// match while the invite is still unclaimed (status = 'invited') — once
+// someone's converted, the token shouldn't silently pre-fill a new
+// signup attempt as if it were still open.
+export async function lookupWaitlistInvite(token: string): Promise<{ email: string; full_name: string } | null> {
+  if (!token) return null;
+
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("waitlist_signups")
+    .select("email, full_name")
+    .eq("invite_token", token)
+    .eq("status", "invited")
+    .maybeSingle();
+
+  return data ?? null;
+}
