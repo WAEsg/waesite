@@ -15,7 +15,11 @@ const CROSS_LINKS = [
 ];
 
 export default async function TermsPage() {
-  const content = await readLegalDocument("tos");
+  const raw = await readLegalDocument("tos");
+  // The page's own header already renders "Terms of Service" (paired
+  // with the status line and stamp) — drop the doc's redundant leading
+  // "## Terms of Service" so it isn't repeated inside the card.
+  const content = raw.replace(/^##\s+.+\n/, "");
 
   return (
     <div>

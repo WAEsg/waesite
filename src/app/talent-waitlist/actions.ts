@@ -49,6 +49,7 @@ export async function submitWaitlistSignup(
         message: "That email is already on the Founding Talent waitlist — we'll be in touch.",
       };
     }
+    console.error("[waitlist] insert failed", error);
     return { status: "error", message: "Something went wrong. Please try again." };
   }
 
