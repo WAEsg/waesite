@@ -43,8 +43,10 @@ export function WaitlistForm() {
 
       <label className={labelClasses}>
         Skill category
-        <select name="skill_category" defaultValue="" className={fieldClasses}>
-          <option value="">Choose the closest fit</option>
+        <select name="skill_category" required defaultValue="" className={fieldClasses}>
+          <option value="" disabled>
+            Choose the closest fit
+          </option>
           {skillClusters.map((cluster) => (
             <option key={cluster.slug} value={cluster.label}>
               {cluster.label}
@@ -55,8 +57,8 @@ export function WaitlistForm() {
 
       <label className={labelClasses}>
         Portfolio or work sample link
-        <span className="mb-1.5 text-sm font-normal text-slate">Optional — a Drive folder, site, or LinkedIn works fine.</span>
-        <input name="portfolio_link" type="url" placeholder="https://" className={fieldClasses} />
+        <span className="mb-1.5 text-sm font-normal text-slate">A Drive folder, site, or LinkedIn works fine.</span>
+        <input name="portfolio_link" type="url" required placeholder="https://" className={fieldClasses} />
       </label>
 
       <label className={labelClasses}>
