@@ -63,6 +63,7 @@ export default function NewJobPostPage() {
         <label className="flex items-center gap-2 text-sm text-slate">
           <input type="checkbox" name="urgent" className="h-4 w-4 rounded border-line" />
           Mark as urgent priority
+          <span className="text-slate">— S$50–100 flat fee, for 24–48hr matching</span>
         </label>
 
         <FormError message={state.error} />

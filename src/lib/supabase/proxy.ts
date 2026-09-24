@@ -81,6 +81,24 @@ export async function updateSession(request: NextRequest) {
       url.pathname = VERIFY_PATH;
       return NextResponse.redirect(url);
     }
+
+    // A role-specific dashboard section (/dashboard/hirer, /dashboard/talent,
+    // /dashboard/admin) is only for that role — nothing upstream of this
+    // actually checked that before. Admins can pass through any section for
+    // support purposes; everyone else gets bounced to /dashboard, which
+    // already knows how to route them to their own section.
+    const roleSection = profile.role === "admin" ? null : `/dashboard/${profile.role}`;
+    const inWrongSection =
+      profile.role !== "admin" &&
+      (pathname.startsWith("/dashboard/hirer") ||
+        pathname.startsWith("/dashboard/talent") ||
+        pathname.startsWith("/dashboard/admin")) &&
+      !pathname.startsWith(roleSection!);
+    if (inWrongSection) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;
