@@ -63,45 +63,59 @@ async function notifyTalentPaymentReleased(contractId: string, passThroughAmount
 // is logged with is_simulated: true, so the audit trail always reflects
 // what actually happened rather than silently pretending money moved.
 // There is no live Stripe account behind this yet; the calls below are
-// written for real (destination-charge Connect shape) so they're ready
-// to go live the moment real keys + connected accounts exist.
+// written for real ahead of that.
 //
-// The platform fee is split from the pass-through amount using Stripe's
-// application_fee_amount, set AT THE POINT the PaymentIntent is created —
-// never computed afterward by subtracting a transfer from a total. See
-// src/lib/stripe/fees.ts for the fee-schedule math that produces the
-// FeeBreakdown callers pass in here.
+// This uses Stripe Connect's "separate charges and transfers" shape, not
+// a destination charge: holdEscrow charges the hirer in full, landing in
+// the PLATFORM's own Stripe balance (nothing is split or sent to the
+// talent yet), and releaseEscrow later moves the talent's share out with
+// a plain Transfer. A destination charge (application_fee_amount +
+// transfer_data.destination set at charge time) collapses the charge and
+// the payout into one instant — fine for pay-on-completion, but it can't
+// represent an actual hold, since it has nothing left to do later. And a
+// manual-capture authorization (the other way to "not pay out yet")
+// isn't a real hold either: card networks void an uncaptured
+// authorization after about a week, far short of a multi-week milestone
+// or a 15-day retainer period. A completed charge that just sits in the
+// platform's balance has no such expiry — see
+// https://docs.stripe.com/connect/separate-charges-and-transfers.
+//
+// The platform fee is simply whatever isn't transferred out at release —
+// there's no application_fee_amount involved in this shape, since that's
+// a destination-charge-only parameter. See src/lib/stripe/fees.ts for the
+// fee-schedule math that produces the FeeBreakdown callers pass in here.
 
-// Not currently wired to a real trigger — there's no card-collection UI
-// yet for hirers, so nothing calls this today. Kept ready for when a
-// "charge on milestone creation, capture on approval" flow is built;
-// releaseEscrow below instead creates-and-confirms a destination charge
-// in one step, since that's the only payment-creation moment that
-// actually exists in this app right now.
+// Charges the hirer in full, immediately, for fees.totalCharge. This is
+// what actually creates the "hold" — see the file-level comment above for
+// why this has to be a real charge rather than an authorization. Not
+// wired to a real trigger yet: there's no hirer card-collection UI, so
+// nothing calls this today. Once that exists, it should run at
+// milestone/period creation, with releaseEscrow (below) transferring out
+// the talent's share once that milestone/period is approved.
 export async function holdEscrow(params: {
   contractId: string;
   milestoneId?: string;
   fees: FeeBreakdown;
   currency?: string;
   hirerStripeCustomerId?: string | null;
-  talentStripeAccountId?: string | null;
 }) {
-  const { contractId, milestoneId, fees, currency = "sgd", hirerStripeCustomerId, talentStripeAccountId } =
-    params;
+  const { contractId, milestoneId, fees, currency = "sgd", hirerStripeCustomerId } = params;
   const stripe = getStripeClient();
   let stripeReferenceId: string | null = null;
 
-  if (stripe && hirerStripeCustomerId && talentStripeAccountId) {
+  if (stripe && hirerStripeCustomerId && fees.totalCharge > 0) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(fees.totalCharge * 100),
       currency,
       customer: hirerStripeCustomerId,
-      capture_method: "manual",
-      application_fee_amount: Math.round(fees.applicationFeeAmount * 100),
-      transfer_data: { destination: talentStripeAccountId },
+      confirm: true,
+      off_session: true,
       metadata: { contract_id: contractId, milestone_id: milestoneId ?? "", purpose: "escrow_hold" },
     });
-    stripeReferenceId = paymentIntent.id;
+    // Stored as the source_transaction releaseEscrow needs later — a
+    // confirmed PaymentIntent's latest_charge is a plain charge id
+    // (string) unless explicitly expanded.
+    stripeReferenceId = (paymentIntent.latest_charge as string | null) ?? paymentIntent.id;
   }
 
   return logPaymentEvent({
@@ -117,12 +131,15 @@ export async function holdEscrow(params: {
   });
 }
 
-// Charges the client and pays the talent in one step (there's no prior
-// hold to capture in this codebase yet — see holdEscrow above). The fee
-// split is set on the PaymentIntent at creation time via
-// application_fee_amount + transfer_data.destination, which is what
-// makes this "at the point of payment" rather than a manual transfer of
-// a pre-subtracted amount.
+// Transfers the talent's share out of the platform's balance for a
+// milestone/period that was already charged in full by holdEscrow — it
+// does not charge the hirer again. Requires a prior real escrow_hold
+// payment_event for this contract/milestone to exist, since a Transfer's
+// source_transaction has to point at the original charge; this throws
+// rather than silently charging or silently doing nothing, because a
+// missing hold here means holdEscrow was never wired into whatever
+// creates milestones/periods yet — better to fail loudly during that
+// gap than to quietly move money (or fail to) in a way nobody notices.
 export async function releaseEscrow(params: {
   contractId: string;
   milestoneId?: string;
@@ -131,23 +148,39 @@ export async function releaseEscrow(params: {
   hirerStripeCustomerId?: string | null;
   talentStripeAccountId?: string | null;
 }) {
-  const { contractId, milestoneId, fees, currency = "sgd", hirerStripeCustomerId, talentStripeAccountId } =
-    params;
+  const { contractId, milestoneId, fees, currency = "sgd", talentStripeAccountId } = params;
   const stripe = getStripeClient();
   let stripeReferenceId: string | null = null;
 
-  if (stripe && hirerStripeCustomerId && talentStripeAccountId && fees.totalCharge > 0) {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(fees.totalCharge * 100),
+  if (stripe && talentStripeAccountId && fees.talentReceives > 0) {
+    const admin = createAdminClient();
+    let holdQuery = admin
+      .from("payment_events")
+      .select("stripe_reference_id")
+      .eq("contract_id", contractId)
+      .eq("event_type", "escrow_hold")
+      .eq("is_simulated", false)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    holdQuery = milestoneId ? holdQuery.eq("milestone_id", milestoneId) : holdQuery.is("milestone_id", null);
+    const { data: hold } = await holdQuery.maybeSingle();
+
+    if (!hold?.stripe_reference_id) {
+      throw new Error(
+        `releaseEscrow: no prior escrow_hold payment found for contract ${contractId}` +
+          (milestoneId ? `, milestone ${milestoneId}` : "") +
+          " — holdEscrow must charge the hirer before a release can transfer funds out."
+      );
+    }
+
+    const transfer = await stripe.transfers.create({
+      amount: Math.round(fees.talentReceives * 100),
       currency,
-      customer: hirerStripeCustomerId,
-      confirm: true,
-      off_session: true,
-      application_fee_amount: Math.round(fees.applicationFeeAmount * 100),
-      transfer_data: { destination: talentStripeAccountId },
+      destination: talentStripeAccountId,
+      source_transaction: hold.stripe_reference_id,
       metadata: { contract_id: contractId, milestone_id: milestoneId ?? "", purpose: "release" },
     });
-    stripeReferenceId = paymentIntent.id;
+    stripeReferenceId = transfer.id;
   }
 
   const event = await logPaymentEvent({
@@ -209,6 +242,12 @@ export async function chargePlacementFee(params: {
   return event;
 }
 
+// Refunds a charge directly by PaymentIntent id — works the same way
+// whether that charge already had its talent share transferred out or
+// not. If it has, this doesn't claw that back; a refund covering an
+// already-transferred amount needs a Transfer Reversal against the
+// talent's connected account too, which isn't handled here yet. Revisit
+// once holdEscrow/releaseEscrow are actually wired to a real trigger.
 export async function refundEscrow(params: {
   contractId: string;
   terminationId?: string;
