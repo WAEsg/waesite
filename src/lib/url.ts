@@ -1,4 +1,5 @@
 import type { FocusEvent } from "react";
+import { z } from "zod";
 
 // Shared by every "paste a link" field (waitlist portfolio, talent
 // profile resume/portfolio, hirer company website). People type
@@ -35,3 +36,12 @@ export function handleUrlBlur(e: FocusEvent<HTMLInputElement>) {
   input.value = normalized;
   input.setCustomValidity(normalized && !isValidUrl(normalized) ? "Enter a valid link, e.g. waework.com" : "");
 }
+
+// Shared Zod fragment for an optional "paste a link" field — normalizes
+// protocol-less input before validating, same rules as handleUrlBlur.
+export const optionalUrlSchema = z
+  .string()
+  .trim()
+  .optional()
+  .transform((v) => (v ? normalizeUrl(v) : v))
+  .refine((v) => !v || isValidUrl(v), "Enter a valid URL, e.g. waework.com");

@@ -56,6 +56,7 @@ export interface Database {
           stripe_customer_id: string | null;
           onboarding_dismissed_at: string | null;
           no_show_count: number;
+          avatar_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -71,6 +72,7 @@ export interface Database {
           stripe_customer_id?: string | null;
           onboarding_dismissed_at?: string | null;
           no_show_count?: number;
+          avatar_url?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["users"]["Insert"]>;
       };

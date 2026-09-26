@@ -5,13 +5,21 @@ import { ArrowRight } from "lucide-react";
 import { completeOnboarding, type OnboardingActionState } from "./actions";
 import { FormError, SubmitButton } from "@/components/ui/form-field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { AvatarUpload } from "@/components/forms/avatar-upload";
+import { handleUrlBlur } from "@/lib/url";
 import { useRolePreference } from "@/lib/use-role-preference";
 
 const initialState: OnboardingActionState = { error: null };
 const fieldClasses =
   "mt-1.5 min-h-[50px] w-full rounded-[10px] border-[1.5px] border-field-line bg-white px-4 py-3 text-base text-ink-navy outline-none transition hover:border-voyage-blue focus:border-voyage-blue focus:ring-4 focus:ring-passport-sky/[0.22]";
 
-export function OnboardingForm({ defaultRole = null }: { defaultRole?: "hirer" | "talent" | null }) {
+export function OnboardingForm({
+  defaultRole = null,
+  userId,
+}: {
+  defaultRole?: "hirer" | "talent" | null;
+  userId: string;
+}) {
   const [state, formAction, pending] = useActionState(completeOnboarding, initialState);
   const [role, setRole] = useRolePreference();
   const [localRole] = useState(role ?? defaultRole);
@@ -51,6 +59,33 @@ export function OnboardingForm({ defaultRole = null }: { defaultRole?: "hirer" |
           Business name
           <input name="business_name" required className={fieldClasses} />
         </label>
+      )}
+
+      {current === "talent" && (
+        <>
+          <div className="flex flex-col gap-2">
+            <span className="font-extrabold text-ink-navy">Profile photo</span>
+            <AvatarUpload userId={userId} />
+          </div>
+
+          <label className="flex flex-col font-extrabold text-ink-navy">
+            A couple of lines about you
+            <span className="mb-1.5 text-sm font-normal text-slate">Optional. What you do, and what you&apos;re looking for.</span>
+            <textarea name="bio" rows={3} maxLength={2000} className={fieldClasses} />
+          </label>
+
+          <label className="flex flex-col font-extrabold text-ink-navy">
+            Portfolio or work sample link
+            <span className="mb-1.5 text-sm font-normal text-slate">Optional — a Drive folder, site, or LinkedIn works fine.</span>
+            <input name="portfolio_link" type="text" inputMode="url" placeholder="waework.com" onBlur={handleUrlBlur} className={fieldClasses} />
+          </label>
+
+          <label className="flex flex-col font-extrabold text-ink-navy">
+            Resume link
+            <span className="mb-1.5 text-sm font-normal text-slate">Optional — a link to your resume (Drive, Dropbox, etc.).</span>
+            <input name="resume_url" type="text" inputMode="url" placeholder="waework.com" onBlur={handleUrlBlur} className={fieldClasses} />
+          </label>
+        </>
       )}
 
       <FormError message={state.error} />

@@ -34,7 +34,7 @@ export default async function OnboardingPage() {
       title="Tell us a bit about you"
       lede="This sets up the right dashboard for you."
     >
-      <OnboardingForm defaultRole={defaultRole} />
+      <OnboardingForm defaultRole={defaultRole} userId={user.id} />
     </SignupWizardShell>
   );
 }
