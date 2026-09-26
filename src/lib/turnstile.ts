@@ -5,7 +5,10 @@
 export async function verifyTurnstile(token: FormDataEntryValue | null) {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return true;
-  if (!token || typeof token !== "string") return false;
+  if (!token || typeof token !== "string") {
+    console.error("[turnstile] no token submitted — widget likely didn't render or didn't finish solving client-side");
+    return false;
+  }
 
   const res = await fetch(
     "https://challenges.cloudflare.com/turnstile/v0/siteverify",
@@ -15,6 +18,9 @@ export async function verifyTurnstile(token: FormDataEntryValue | null) {
       body: new URLSearchParams({ secret, response: token }),
     }
   );
-  const data = (await res.json()) as { success: boolean };
+  const data = (await res.json()) as { success: boolean; "error-codes"?: string[] };
+  if (!data.success) {
+    console.error("[turnstile] siteverify rejected token", data["error-codes"]);
+  }
   return data.success;
 }
